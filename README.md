@@ -1,3 +1,4 @@
+Change to using file instead of certificate store for use with github Actions
 Thank you to [keytos](https://github.com/markeytos/code-sign-action) for providing a base for me to create this action. 
 
 # Code sign a file
@@ -51,7 +52,7 @@ $fileContentBytes = get-content 'YOURFILEPATH.pfx' -Encoding Byte
 ```
 runs-on: windows-latest
 steps:
-  uses: skymatic/code-sign-action@v1
+  uses: inertiasystems/code-sign-action@v1
   with:
     certificate: '${{ secrets.CERTIFICATE }}'
     password: '${{ secrets.PASSWORD }}'
