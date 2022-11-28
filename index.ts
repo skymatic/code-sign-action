@@ -47,7 +47,7 @@ async function addCertificateToStore(){
     } catch( err) {
         if(isChildProcessError(err)) {
             console.log(err.stdout);
-            console.error('Process to add certificate exited with code {}.', err.code);
+            console.error('Process to add certificate exited with code %d.', err.code);
             console.error(err.stderr)
         }
         throw err;
@@ -88,7 +88,7 @@ async function signWithSigntool(signtool: string, fileName: string) {
     } catch(err) {
         if( isChildProcessError(err) ) {
             console.log(err.stdout);
-            console.error('Process to sign file exited with code {}.', err.code);
+            console.error('Process to sign file exited with code %d.', err.code);
             console.error(err.stderr);
         }
         throw err;
@@ -144,7 +144,7 @@ async function getSigntoolLocation() {
         }
         const folderVersion = parseInt(folder.replace(/\./g,''));
         if (folderVersion > maxVersion) {
-            const signtoolFilename = `${windowsKitsFolder}${folder}/x86/signtool.exe`;
+            const signtoolFilename = `${windowsKitsFolder}${folder}/x64/signtool.exe`;
             try {
                 const stat = await fs.stat(signtoolFilename);
                 if (stat.isFile()) {
@@ -153,7 +153,7 @@ async function getSigntoolLocation() {
                 }
             }
             catch {
-                console.warn('Skipping {} due to error.', signtoolFilename);
+                console.warn('Skipping %s due to error.', signtoolFilename);
             }
         }
     }
