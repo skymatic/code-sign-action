@@ -35,7 +35,7 @@ jobs:
         uses: ./
         with:
           certificate: '${{ steps.generate-cert.outputs.certificate }}'
-          certificatesha1: '{{ steps.generate-cert.outputs.certSha1 }}'
+          certificatesha1: '${{ steps.generate-cert.outputs.certSha1 }}'
           password: '${{ steps.generate-cert.outputs.certPassword }}'
           folder: 'files'
           recursive: true
