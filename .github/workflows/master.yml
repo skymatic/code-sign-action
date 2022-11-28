@@ -32,7 +32,7 @@ jobs:
       - name: Run the action
         uses: ./
         with:
-          certificate: '${{ steps.generate-cert.certificate }}'
-          password: '${{ steps.generate-cert.certPassword }}'
+          certificate: '${{ steps.generate-cert.outputs.certificate }}'
+          password: '${{ steps.generate-cert.outputs.certPassword }}'
           folder: 'files'
           recursive: true
