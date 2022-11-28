@@ -25,8 +25,7 @@ jobs:
           $password = 'ThisIsASuperLongPassword'
           $securedPwd = ConvertTo-SecureString -String $password -Force -AsPlainText
           $pfxFile = 'testCert.pfx'
-          echo $cert.PSParentPath
-          Export-PfxCertificate -FilePath $pfxFile -Password $securedPwd -Cert "Cert:\CurrentUser\My\${cert.Thumbprint}" -Force
+          Export-PfxCertificate -FilePath $pfxFile -Password $securedPwd -Cert "Cert:\CurrentUser\My\$(cert.Thumbprint)" -Force
           $base64PfxCert = [convert]::ToBase64String((Get-Content -path $pfxFile -AsByteStream))
           echo "certificate=$base64PfxCert" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           echo "certPassword=$password" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
