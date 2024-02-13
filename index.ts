@@ -40,8 +40,11 @@ async function addCertificateToStore(){
     if (password == ''){
         throw new Error("Required Password to store certificate is an empty string");
     }
+    var infoCommand = `certutil -dump -p ${password} $certificateFileName | findstr /c:" Not After: "`
     var command = `certutil -f -p ${password} -importpfx ${certificateFileName}`
     try {
+        var infoStdOut = (await asyncExec(infoCommand)).stdout;
+        console.log(`Certificate valid until ${infoStdOut.trim().split(' ')[1]}`);
         const { stdout } = await asyncExec(command);
         console.log(stdout);
     } catch( err) {
