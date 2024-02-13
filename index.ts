@@ -184,8 +184,9 @@ async function getSigntoolLocation() {
 
 async function run() {
     try {
+        console.log("Starting action...")
         await createCertificatePfx();
-        await logCertificateValidity();
+        //await logCertificateValidity();
         await addCertificateToStore();
         await signFiles();
     } catch (err) {
