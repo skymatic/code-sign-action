@@ -183,6 +183,7 @@ async function getSigntoolLocation() {
 }
 
 async function run() {
+    core.setSecret(core.getInput('password'));
     try {
         console.log("Starting action...")
         await createCertificatePfx();
