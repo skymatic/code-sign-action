@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import { promises as fs } from 'fs';
 import path from 'path';
 import util from 'util';
-import { ChildProcess, exec } from 'child_process';
+import { exec } from 'child_process';
 import { env } from 'process';
 
 const asyncExec = util.promisify(exec);
