@@ -43,9 +43,9 @@ async function logCertificateValidity() {
         core.info(`Certificate valid until ${stdout.trim().split(' ')[1]}`);
     } catch( err) {
         if(isChildProcessError(err)) {
-            console.log(err.stdout);
             core.error(`Process to add certificate exited with code ${err.code}.`);
-            core.error(err.stderr)
+            core.error(err.stdout);
+            core.error(err.stderr.replace(password, '***'))
         }
         throw err;
     }
@@ -63,9 +63,9 @@ async function addCertificateToStore(){
         core.debug(stdout);
     } catch( err) {
         if(isChildProcessError(err)) {
-            console.log(err.stdout);
             core.error(`Process to add certificate exited with code ${err.code}.`);
-            core.error(err.stderr)
+            core.error(err.stdout);
+            core.error(err.stderr.replace(password, '***'))
         }
         throw err;
     }
