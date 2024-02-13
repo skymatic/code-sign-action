@@ -31,8 +31,24 @@ async function createCertificatePfx() {
     if (certificate.length == 0) {
         throw new Error("Required certificate is an empty string")
     }
-    console.log(`Writing ${certificate.length} bytes to ${certificateFileName}.`);
+    core.debug(`Writing ${certificate.length} bytes to ${certificateFileName}.`);
     await fs.writeFile(certificateFileName, certificate);
+}
+
+async function logCertificateValidity() {
+    const password : string= core.getInput('password');
+    var infoCommand = `certutil -dump -p ${password} $certificateFileName | findstr /c:" Not After: "`
+    try {
+        const { stdout } = await asyncExec(infoCommand);
+        core.info(`Certificate valid until ${stdout.trim().split(' ')[1]}`);
+    } catch( err) {
+        if(isChildProcessError(err)) {
+            console.log(err.stdout);
+            core.error(`Process to add certificate exited with code ${err.code}.`);
+            core.error(err.stderr)
+        }
+        throw err;
+    }
 }
 
 async function addCertificateToStore(){
@@ -40,18 +56,16 @@ async function addCertificateToStore(){
     if (password == ''){
         throw new Error("Required Password to store certificate is an empty string");
     }
-    var infoCommand = `certutil -dump -p ${password} $certificateFileName | findstr /c:" Not After: "`
+
     var command = `certutil -f -p ${password} -importpfx ${certificateFileName}`
     try {
-        var infoStdOut = (await asyncExec(infoCommand)).stdout;
-        console.log(`Certificate valid until ${infoStdOut.trim().split(' ')[1]}`);
         const { stdout } = await asyncExec(command);
-        console.log(stdout);
+        core.debug(stdout);
     } catch( err) {
         if(isChildProcessError(err)) {
             console.log(err.stdout);
-            console.error('Process to add certificate exited with code %d.', err.code);
-            console.error(err.stderr)
+            core.error(`Process to add certificate exited with code ${err.code}.`);
+            core.error(err.stderr)
         }
         throw err;
     }
@@ -81,25 +95,25 @@ async function signWithSigntool(signtool: string, fileName: string) {
         command = command + ` /d "${desc}"`
     }
     if (!vitalParameterIncluded){
-        console.warn("You need to include a NAME or a SHA1 Hash for the certificate to sign with.")
+        core.warning("You need to include a NAME or a SHA1 Hash for the certificate to sign with.")
     }
     command = command + ` ${fileName}`;
-    console.log("Signing command: " + command);
+    core.debug("Signing command: " + command);
     try {
         const { stdout } = await asyncExec(command);
-        console.log(stdout);
+        core.debug(stdout);
     } catch(err) {
         if( isChildProcessError(err) ) {
             console.log(err.stdout);
-            console.error('Process to sign file exited with code %d.', err.code);
-            console.error(err.stderr);
+            core.error(`Process to sign file exited with code ${err.code}.`);
+            core.error(err.stderr);
         }
         throw err;
     }
 }
 
 async function trySignFile(signtool: string, fileName: string) {
-    console.log(`Signing ${fileName}.`);
+    core.info(`Signing ${fileName}.`);
     const extension = path.extname(fileName);
     if (signtoolFileExtensions.includes(extension)) {
         await signWithSigntool(signtool, fileName);
@@ -156,7 +170,7 @@ async function getSigntoolLocation() {
                 }
             }
             catch {
-                console.warn('Skipping %s due to error.', signtoolFilename);
+                core.debug(`Skipping ${signtoolFilename} due to error.`);
             }
         }
     }
@@ -164,13 +178,14 @@ async function getSigntoolLocation() {
         throw new Error('Unable to find signtool.exe in ' + windowsKitsFolder);
     }
 
-    console.log(`Signtool location is ${fileName}.`);
+    core.info(`Signtool location is ${fileName}.`);
     return fileName;
 }
 
 async function run() {
     try {
         await createCertificatePfx();
+        await logCertificateValidity();
         await addCertificateToStore();
         await signFiles();
     } catch (err) {
