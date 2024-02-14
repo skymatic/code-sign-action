@@ -37,7 +37,7 @@ async function createCertificatePfx() {
 
 async function logCertificateValidity() {
     const password : string= core.getInput('password');
-    var infoCommand = `certutil -v -dump -p "${password}" "${certificateFileName}"`; // | findstr /c:" Not After: "`
+    var infoCommand = `certutil -v -dump -p "${password}" "${certificateFileName}" | findstr /c:"Not After:"`
     try {
         const { stdout } = await asyncExec(infoCommand);
         console.log(`Certificate valid until ${stdout.trim().split(' ')[1]}`);
