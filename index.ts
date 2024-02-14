@@ -43,11 +43,9 @@ async function printCertificateExpirationDate() {
         console.log(`Certificate valid until ${stdout.trim().split('=')[1]}`);
     } catch( err) {
         if(isChildProcessError(err)) {
-            console.log(err.stdout);
-            console.error('Process to read certificate exited with code %d.', err.code);
-            console.error(err.stderr)
+            console.log('Skipping print certificate expiration date due to error (Return code %d).', err.code);
+            console.log('Ensure openssl is installed on system.');
         }
-        throw err;
     }
 }
 
@@ -185,8 +183,8 @@ async function run() {
     core.setSecret(core.getInput('password'));
     try {
         await createCertificatePfx();
-        await printCertificateExpirationDate();
         await addCertificateToStore();
+        await printCertificateExpirationDate();
         await signFiles();
     } catch (err) {
         if (err instanceof Error) {
