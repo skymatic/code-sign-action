@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import { promises as fs } from 'fs';
 import path from 'path';
 import util from 'util';
-import { ChildProcess, exec } from 'child_process';
+import { exec } from 'child_process';
 import { env } from 'process';
 
 const asyncExec = util.promisify(exec);
@@ -51,6 +51,20 @@ async function addCertificateToStore(){
             console.error(err.stderr)
         }
         throw err;
+    }
+}
+
+async function printCertificateExpirationDate() {
+    const password : string= core.getInput('password');
+    var infoCommand = `openssl pkcs12 -in "${certificateFileName}" -nodes -passin pass:"${password}"| openssl x509 -noout -enddate"`
+    try {
+        const { stdout } = await asyncExec(infoCommand);
+        console.log(`Certificate valid until ${stdout.trim().split('=')[1]}`);
+    } catch( err) {
+        if(isChildProcessError(err)) {
+            console.log('Skipping print certificate expiration date due to error (Return code %d).', err.code);
+            console.log('Ensure openssl is installed on system.');
+        }
     }
 }
 
@@ -166,9 +180,11 @@ async function getSigntoolLocation() {
 }
 
 async function run() {
+    core.setSecret(core.getInput('password'));
     try {
         await createCertificatePfx();
         await addCertificateToStore();
+        await printCertificateExpirationDate();
         await signFiles();
     } catch (err) {
         if (err instanceof Error) {
