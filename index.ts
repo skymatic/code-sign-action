@@ -40,7 +40,7 @@ async function logCertificateValidity() {
     var infoCommand = `certutil -dump -p ${password} ${certificateFileName} | findstr /c:" Not After: "`
     try {
         const { stdout } = await asyncExec(infoCommand);
-        core.info(`Certificate valid until ${stdout.trim().split(' ')[1]}`);
+        console.log(`Certificate valid until ${stdout.trim().split(' ')[1]}`);
     } catch( err) {
         if(isChildProcessError(err)) {
             console.log(err.stdout);
@@ -56,11 +56,8 @@ async function addCertificateToStore(){
     if (password == ''){
         throw new Error("Required Password to store certificate is an empty string");
     }
-    var infoCommand = `certutil -dump -p ${password} $certificateFileName | findstr /c:" Not After: "`
     var command = `certutil -f -p ${password} -importpfx ${certificateFileName}`
     try {
-        var infoStdOut = (await asyncExec(infoCommand)).stdout;
-        console.log(`Certificate valid until ${infoStdOut.trim().split(' ')[1]}`);
         const { stdout } = await asyncExec(command);
         console.log(stdout);
     } catch( err) {
