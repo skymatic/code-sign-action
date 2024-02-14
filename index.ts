@@ -35,12 +35,12 @@ async function createCertificatePfx() {
     await fs.writeFile(certificateFileName, certificate);
 }
 
-async function logCertificateValidity() {
+async function printCertificateExpirationDate() {
     const password : string= core.getInput('password');
-    var infoCommand = `certutil -v -dump -p "${password}" "${certificateFileName}" | findstr /c:" NotAfter: "`
+    var infoCommand = `openssl pkcs12 -in "${certificateFileName}" -nodes -passin pass:"${password}"| openssl x509 -noout -enddate"`
     try {
         const { stdout } = await asyncExec(infoCommand);
-        console.log(`Certificate valid until ${stdout.trim().split(' ')[1]}`);
+        console.log(`Certificate valid until ${stdout.trim().split('=')[1]}`);
     } catch( err) {
         if(isChildProcessError(err)) {
             console.log(err.stdout);
@@ -185,7 +185,7 @@ async function run() {
     core.setSecret(core.getInput('password'));
     try {
         await createCertificatePfx();
-        await logCertificateValidity();
+        await printCertificateExpirationDate();
         await addCertificateToStore();
         await signFiles();
     } catch (err) {
