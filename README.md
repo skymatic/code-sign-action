@@ -2,7 +2,12 @@ Thank you to [keytos](https://github.com/markeytos/code-sign-action) for providi
 
 # Code sign a file
 
-This action signs files that are supported by `signtool.exe` with a code signing certificate that takes in a password. This action only works on Windows and that means it should run on `windows-latest`.
+This action signs files that are supported by `signtool.exe` with a code signing certificate that takes in a password.
+This action only works on Windows and that means it should run on `windows-latest`.
+If `openssl` is installed on the OS, this action also prints the certificate expiration date to the runner log.
+
+> [!NOTE]
+> `certutil` is not used, since it only prints certificate information in a localized format.
 
 ## Inputs
 
