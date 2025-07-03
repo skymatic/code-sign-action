@@ -12,6 +12,7 @@ jobs:
         run: |
           mkdir files
           copy C:\Windows\System32\wmi.dll files
+          copy files\wmi.dll "files\wmi with three spaces.dll"
           cd files
           mkdir subdirectory
           copy C:\Windows\System32\wmi.dll subdirectory
